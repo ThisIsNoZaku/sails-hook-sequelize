@@ -76,12 +76,13 @@ module.exports = sails => {
                 global['SequelizeConnections'] = connections;
             }
 
+            const shareModels = sails.config[this.configKey].shareModelsAmongConnections;
+
             return originalLoadModels((err, models) => {
 
                 if (err) {
                     return next(err);
                 }
-
                 self.defineModels(models, connections);
                 self.migrateSchema(next, connections, models);
             });
@@ -151,7 +152,7 @@ module.exports = sails => {
             // Try to read settings from old Sails then from the new.
             // 0.12: sails.config.models.connection
             // 1.00: sails.config.models.datastore
-            const defaultConnection = sails.config.models.connection || sails.config.models.datastore || 'default';
+            const defaultConnection = sails.config.models.connection || sails.config.models.datastore ||  'default';
 
             for (connection in connections) {
 
@@ -163,9 +164,14 @@ module.exports = sails => {
                         continue;
                     }
 
+                    if (sails.config[this.configKey].shareModelsAmongConnections) {
+                        modelDef.context = connection;
+                        modelDef.globalId = `${connection}.${modelDef.identity}`;
+                        modelDef.connection = connection;
+                    }
+
                     sails.log.verbose('Loading Sequelize model \'' + modelDef.globalId + '\'');
-                    connectionName = modelDef.connection || modelDef.datastore ||
-                        (sails.config[this.configKey].shareModelsAmongConnections ? connection : undefined) || defaultConnection;
+                    connectionName = modelDef.connection || modelDef.datastore || defaultConnection;
                     modelClass = connections[connectionName].define(modelDef.globalId, modelDef.attributes, modelDef.options);
 
                     if (sequelizeMajVersion >= 4) {
