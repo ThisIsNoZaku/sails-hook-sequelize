@@ -81,6 +81,7 @@ module.exports = sails => {
                 if (err) {
                     return next(err);
                 }
+                
                 self.defineModels(models, connections);
                 self.migrateSchema(next, connections, models);
             });
