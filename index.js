@@ -76,14 +76,22 @@ module.exports = sails => {
                 global['SequelizeConnections'] = connections;
             }
 
+            const shareModels = sails.config[this.configKey].shareModelsAmongConnections;
+
             return originalLoadModels((err, models) => {
 
                 if (err) {
                     return next(err);
                 }
-
-                self.defineModels(models, connections);
-                self.migrateSchema(next, connections, models);
+                if (shareModels) {
+                    connections.forEach(connection => {
+                        self.defineModels(models, [connection]);
+                        self.migrateSchema(next, [connection], models);
+                    });
+                }  else {
+                    self.defineModels(models, connections);
+                    self.migrateSchema(next, connections, models);
+                }
             });
         },
 
