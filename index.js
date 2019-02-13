@@ -84,9 +84,9 @@ module.exports = sails => {
                     return next(err);
                 }
                 if (shareModels) {
-                    connections.forEach(connection => {
-                        self.defineModels(models, [connection]);
-                        self.migrateSchema(next, [connection], models);
+                    Object.keys(connections).forEach(connection => {
+                        self.defineModels(models, [connections[connection]]);
+                        self.migrateSchema(next, [connections[connection]], models);
                     });
                 }  else {
                     self.defineModels(models, connections);
