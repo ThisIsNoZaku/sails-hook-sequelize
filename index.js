@@ -76,8 +76,6 @@ module.exports = sails => {
                 global['SequelizeConnections'] = connections;
             }
 
-            const shareModels = sails.config[this.configKey].shareModelsAmongConnections;
-
             return originalLoadModels((err, models) => {
 
                 if (err) {
