@@ -184,7 +184,15 @@ module.exports = sails => {
 
                     if (sails.config.globals.models) {
                         sails.log.verbose('Exposing model \'' + modelDef.globalId + '\' globally');
-                        global[modelDef.globalId] = modelClass;
+                        const nameSegments = modelDef.globalId.split('.');
+                        if (nameSegments.length === 1) {
+                            global[modelDef.globalId] = modelClass;
+                        } else if (nameSegments.length === 2){
+                            global[nameSegments[1]] = modelClass;
+                            global[nameSegments[1]][nameSegments[0]] = modelClass;
+                        } else {
+                            throw new Error(`Nested contexts are not supported; ${modelDef.globalId} contains too many segments but only exactly 1 or 2 are support.`);
+                        }
                     }
                     sails.models[modelDef.globalId.toLowerCase()] = modelClass;
                 }
