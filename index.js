@@ -151,7 +151,7 @@ module.exports = sails => {
             // Try to read settings from old Sails then from the new.
             // 0.12: sails.config.models.connection
             // 1.00: sails.config.models.datastore
-            const defaultConnection = sails.config.models.connection || sails.config.models.datastore ||  'default';
+            const defaultConnection = sails.config.models.connection || sails.config.models.datastore || 'default';
 
             for (connection in connections) {
 
